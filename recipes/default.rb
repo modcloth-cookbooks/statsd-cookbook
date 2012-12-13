@@ -11,7 +11,7 @@ when "debian", "ubuntu"
   include_recipe "git"
 end
 
-git "/usr/share/statsd" do
+git node[:statsd][:path] do
   repository node[:statsd][:repo]
   revision node[:statsd][:revision]
   action :sync
@@ -19,7 +19,7 @@ end
 
 execute "install dependencies" do
   command "npm install -d"
-  cwd "/usr/share/statsd"
+  cwd node[:statsd][:path]
 end
 
 backends = []
@@ -37,7 +37,7 @@ node[:statsd][:backends].each do |k, v|
 
   execute "install npm module #{name}" do
     command "npm install #{name}"
-    cwd "/usr/share/statsd"
+    cwd node[:statsd][:path]
   end
 
   backends << k
@@ -53,17 +53,15 @@ user "statsd" do
   shell "/bin/false"
 end
 
-service "statsd" do
-  provider Chef::Provider::Service::Upstart
-
-  restart_command "stop statsd; start statsd"
-  start_command "start statsd"
-  stop_command "stop statsd"
-
-  supports :restart => true, :start => true, :stop => true
+# Define services
+case node[:platform]
+  when "debian", "ubuntu"
+    include_recipe "statsd::debian"
+  when "smartos"
+    include_recipe "statsd::smartos"
 end
 
-template "/etc/statsd/config.js" do
+template node[:statsd][:config] do
   source "config.js.erb"
   mode 0644
 
@@ -79,24 +77,6 @@ template "/etc/statsd/config.js" do
   end
 
   variables(:config_hash => config_hash)
-
-  notifies :restart, resources(:service => "statsd")
-end
-
-directory "/usr/share/statsd/scripts" do
-  action :create
-end
-
-template "/usr/share/statsd/scripts/start" do
-  source "upstart.start.erb"
-  mode 0755
-
-  notifies :restart, resources(:service => "statsd")
-end
-
-cookbook_file "/etc/init/statsd.conf" do
-  source "upstart.conf"
-  mode 0644
 
   notifies :restart, resources(:service => "statsd")
 end

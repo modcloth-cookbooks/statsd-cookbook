@@ -1,5 +1,15 @@
 default[:statsd][:repo] = "git://github.com/etsy/statsd.git"
 default[:statsd][:revision] = "master"
+default[:statsd][:config] = "/etc/statsd/config.js"
+default[:statsd][:node_executable] = "node"
+
+case node[:platform]
+  when "ubuntu", "debian"
+    default[:statsd][:path] = "/usr/share/statsd"
+  when "smartos", "solaris"
+  	default[:statsd][:path] = "/usr/local/statsd"
+  	default[:statsd][:node_executable] = "/opt/local/bin/node"
+end
 
 default[:statsd][:log_file] = "/var/log/statsd.log"
 
