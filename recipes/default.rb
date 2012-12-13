@@ -5,8 +5,11 @@
 # Copyright 2011, Librato, Inc.
 #
 
-include_recipe "nodejs"
-include_recipe "git"
+case node[:platform]
+when "debian", "ubuntu"
+  include_recipe "nodejs"
+  include_recipe "git"
+end
 
 git "/usr/share/statsd" do
   repository node[:statsd][:repo]
