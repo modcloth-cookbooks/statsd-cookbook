@@ -11,7 +11,7 @@ smf "statsd" do
 	user "statsd"
 	start_command "#{node[:statsd][:node_executable]} #{node[:statsd][:path]}/stats.js " << 
 		"#{node[:statsd][:config]} 2>&1 >> #{node[:statsd][:log_file]} &"
-	stop_command ":kill -SIGINT"
+	stop_command ":kill -2"
 	working_directory node[:statsd][:path]
 end
 
