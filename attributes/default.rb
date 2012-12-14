@@ -21,6 +21,11 @@ default[:statsd][:graphite_enabled] = true
 default[:statsd][:graphite_port] = 2003
 default[:statsd][:graphite_host] = "localhost"
 
+# Gossip Girl backend
+default[:statsd][:gossip_girl_enabled] = false
+default[:statsd][:gossip_girl_host] = "localhost"
+default[:statsd][:gossip_girl_port] = 8125
+
 #
 # Add all NPM module backends here. Each backend should be a
 # hash of the backend's name to the NPM module's version. If we

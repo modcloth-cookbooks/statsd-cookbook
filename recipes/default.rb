@@ -76,6 +76,15 @@ template node[:statsd][:config] do
     config_hash[:graphiteHost] = node[:statsd][:graphite_host]
   end
 
+  if node[:statsd][:gossip_girl_enabled]
+    config_hash[:gossip_girl] = [
+      {
+        :host => node[:statsd][:gossip_girl_host],
+        :port => node[:statsd][:gossip_girl_port]
+      }
+    ]
+  end
+
   variables(:config_hash => config_hash)
 
   notifies :restart, resources(:service => "statsd")
